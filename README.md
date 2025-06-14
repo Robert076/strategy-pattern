@@ -36,4 +36,12 @@ You notice how scaling the program gets increasingly harder as each new method a
 
 But if instead we use a strategy no new code is needed except for the implementation of the new strategy, and it can be then passed down if it implements the strategy interface.
 
+Making the final code just:
+
+```
+Message.send()
+```
+
+That's it!
+
 Very useful pattern.
