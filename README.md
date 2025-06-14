@@ -1,4 +1,4 @@
-# 🌎 strategy-pattern
+# 🧩 strategy-pattern
 Trying to get used to the strategy design pattern, hence this practice repo. Followed tutorial on refactoring.guru.
 
 This design pattern is recommended to be used in the case of long if statements, where there are ifs after ifs. For example in my message code if I had the Message struct as:
