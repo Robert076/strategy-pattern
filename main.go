@@ -2,83 +2,65 @@ package main
 
 import "fmt"
 
-type EvictionAlgo interface {
-	evict(c *Cache)
+type sendstrategy interface {
+	send(m *Message)
 }
 
-type Fifo struct {
+type email struct {
 }
 
-func (l *Fifo) evict(c *Cache) {
-	fmt.Println("Evicted by fifo strategy")
+func (l *email) send(c *Message) {
+	fmt.Println("sent by email strategy")
 }
 
-type Lru struct {
+type sms struct {
 }
 
-func (l *Lru) evict(c *Cache) {
-	fmt.Println("Evicted by lru strategy")
+func (l *sms) send(c *Message) {
+	fmt.Println("Sent by sms strategy")
 }
 
-type Lfu struct {
+type carrierpigeon struct {
 }
 
-func (l *Lfu) evict(c *Cache) {
-	fmt.Println("Evicted by lfu strategy")
+func (l *carrierpigeon) send(c *Message) {
+	fmt.Println("sent by carrier pigeon strategy")
 }
 
-type Cache struct {
-	storage      map[string]string
-	evictionAlgo EvictionAlgo
-	capacity     int
-	maxCapacity  int
+type Message struct {
+	text         string
+	sendstrategy sendstrategy
 }
 
-func initCache(e EvictionAlgo) *Cache {
-	storage := make(map[string]string)
-	return &Cache{
-		storage:      storage,
-		evictionAlgo: e,
-		capacity:     0,
-		maxCapacity:  2,
+func initMessage(e sendstrategy) *Message {
+	return &Message{
+		text:         "test",
+		sendstrategy: e,
 	}
 }
 
-func (c *Cache) setEvictionAlgo(e EvictionAlgo) {
-	c.evictionAlgo = e
+func (c *Message) setSendAlgo(e sendstrategy) {
+	c.sendstrategy = e
 }
 
-func (c *Cache) add(key, value string) {
-	if c.capacity == c.maxCapacity {
-		c.evict()
-	}
-	c.capacity++
-	c.storage[key] = value
-}
-
-func (c *Cache) get(key string) {
-	delete(c.storage, key)
-}
-
-func (c *Cache) evict() {
-	c.evictionAlgo.evict(c)
-	c.capacity--
+func (c *Message) send() {
+	c.sendstrategy.send(c)
 }
 
 func main() {
-	lfu := &Lfu{}
-	cache := initCache(lfu)
+	lfu := &sms{}
+	Message := initMessage(lfu)
 
-	cache.add("a", "1")
-	cache.add("b", "2")
-	cache.add("c", "3")
+	Message.send()
+	Message.send()
+	Message.send()
 
-	lru := &Lru{}
-	cache.setEvictionAlgo(lru)
-	cache.add("d", "4")
+	lru := &email{}
+	Message.setSendAlgo(lru)
+	Message.send()
 
-	fifo := &Fifo{}
-	cache.setEvictionAlgo(fifo)
+	fifo := &carrierpigeon{}
+	Message.setSendAlgo(fifo)
 
-	cache.add("e", "5")
+	Message.send()
 }
