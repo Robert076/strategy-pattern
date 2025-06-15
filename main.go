@@ -2,65 +2,68 @@ package main
 
 import "fmt"
 
-type sendstrategy interface {
-	send(m *Message)
+type ILanguage interface {
+	sayHi(name string)
 }
 
-type email struct {
+type English struct {
 }
 
-func (l *email) send(c *Message) {
-	fmt.Println("sent by email strategy")
+func (e *English) sayHi(name string) {
+	fmt.Printf("Hi in English, %s", name)
 }
 
-type sms struct {
+type Romanian struct {
 }
 
-func (l *sms) send(c *Message) {
-	fmt.Println("Sent by sms strategy")
+func (r *Romanian) sayHi(name string) {
+	fmt.Printf("Salut in Romana, %s", name)
 }
 
-type carrierpigeon struct {
+type User struct {
+	name             string
+	preferedLanguage ILanguage
 }
 
-func (l *carrierpigeon) send(c *Message) {
-	fmt.Println("sent by carrier pigeon strategy")
+func (u *User) setPreferedLanguage(language ILanguage) {
+	u.preferedLanguage = language
 }
 
-type Message struct {
-	text         string
-	sendstrategy sendstrategy
-}
-
-func initMessage(e sendstrategy) *Message {
-	return &Message{
-		text:         "test",
-		sendstrategy: e,
-	}
-}
-
-func (c *Message) setSendAlgo(e sendstrategy) {
-	c.sendstrategy = e
-}
-
-func (c *Message) send() {
-	c.sendstrategy.send(c)
+func (u *User) setName(name string) {
+	u.name = name
 }
 
 func main() {
-	lfu := &sms{}
-	Message := initMessage(lfu)
+	u := &User{}
+	u.setPreferedLanguage(&English{})
+	u.setName("Robert")
 
-	Message.send()
-	Message.send()
-	Message.send()
+	u.preferedLanguage.sayHi(u.name)
 
-	lru := &email{}
-	Message.setSendAlgo(lru)
-	Message.send()
+	/* if we didnt have those, the code would look something like this(pseudocode):
 
-	fifo := &carrierpigeon{}
-	Message.setSendAlgo(fifo)
+	u := &User{}
+	u.setPreferedLanguage("English")
+	u.setName("Robert")
 
-	Message.send()
+	if u.preferedLanguage == "English" {
+		sayHiInEnglish(u.name)
+	}
+	if u.preferedLanguage == "Romanian" {
+		sayHiInRomanian(u.name)
+	}
+
+	...
+
+	and any new language we have we would add to this never ending if
+
+	If we use the strategy pattern as above however, we are using the open/closed principle
+
+	and so our code is closed for modification but open for extension
+
+	we never have to modify existing code, just define the new strategy and it will work flawlessly
+
+	this might just be my favorite pattern
+
+	*/
 }
